@@ -12,6 +12,7 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Tambahkan ini agar cookie terkirim
         body: JSON.stringify({ username, password }),
       });
 
@@ -19,9 +20,8 @@ const Login = () => {
         throw new Error('Login failed');
       }
 
-      const data = await response.json();
-      document.cookie = `token=${data.token}; path=/`;
       alert('Login successful!');
+      // Redirect user or perform additional actions here
     } catch (error) {
       console.error('Error during login:', error);
       alert('Failed to login');

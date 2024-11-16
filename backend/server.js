@@ -1,27 +1,44 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const authRoutes = require('./routes/authRoutes');
-const chatRoutes = require('./routes/chatRoutes');
-const sequelize = require('./config/database');
-const cors = require("cors"); // Import cors
+const express = require("express");
+const bodyParser = require("body-parser");
+const authRoutes = require("./routes/authRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const verifRoutes = require("./routes/verifRoutes");
+const sequelize = require("./config/database");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 // Inisialisasi aplikasi Express
 const app = express();
-app.use(cors({
-    origin: 'http://localhost:5173',
+
+// Aktifkan CORS dengan credentials
+app.use(
+  cors({
+    origin: "http://localhost:5173",
     credentials: true,
-  }));
+  })
+);
+
+// Aktifkan cookie-parser
+app.use(cookieParser());
+app.use(express.json());
+
+// Parsing JSON body
 app.use(bodyParser.json());
 
-// Endpoint untuk registrasi
-app.use('/api/auth', authRoutes);
-// Endoint untuk Chat
-app.use('/api/chat', chatRoutes);
+// Endpoint untuk registrasi dan login
+app.use("/api/auth", authRoutes);
+
+// Endpoint untuk Chat
+app.use("/api/chat", chatRoutes);
+
+// Endpoint untuk verifikasi
+app.use("/api", verifRoutes);
+
 // Sinkronisasi database
-PORT = process.env.PORT
+const PORT = process.env.PORT; // Gunakan default 5000 jika PORT tidak diset
 sequelize.sync().then(() => {
-  console.log('Database synced');
+  console.log("Database synced");
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

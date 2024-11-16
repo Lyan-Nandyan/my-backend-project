@@ -1,45 +1,80 @@
 import React, { useState, useEffect } from 'react';
 
-const Chat = ({ userId }) => {
-    userId = 1;
+const Chat = () => {
+    const [userId, setUserId] = useState(null);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
     const [receiverId, setReceiverId] = useState('');
 
     useEffect(() => {
-        fetchMessages();
+        // Ambil userId dari backend setelah login
+        const fetchUserId = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/userinfo', {
+                    method: 'GET',
+                    credentials: 'include', // Sertakan cookies HttpOnly
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserId(data.userId); // Set userId dari response
+                } else {
+                    console.error('User not authenticated');
+                    // Redirect ke halaman login jika belum login
+                    //window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error fetching user ID:', error);
+                //window.location.href = '/'; // Redirect jika ada error
+            }
+        };
+
+        fetchUserId();
+    }, []);
+
+    useEffect(() => {
+        if (userId) {
+            fetchMessages();
+        }
     }, [userId]);
 
-    // Fetch messages from the backend
+    // Ambil pesan dari backend
     const fetchMessages = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/chat/${userId}/messages`);
+            const response = await fetch(`http://localhost:5000/api/chat/${userId}/messages`, {
+                method: 'GET',
+                credentials: 'include', // Sertakan cookies HttpOnly
+            });
             const data = await response.json();
-            // Pastikan data adalah array
             if (Array.isArray(data)) {
                 setMessages(data);
             } else {
                 console.error('Data received is not an array:', data);
-                setMessages([]);  // Set as empty array if not an array
+                setMessages([]); // Set sebagai array kosong jika tidak valid
             }
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
     };
 
-    // Send message to the backend
+    // useEffect(() => {
+    //     const interval = setInterval(fetchMessages, 5000);
+    //     return () => clearInterval(interval); // Bersihkan saat komponen unmount
+    // }, []);
+
+    // Mengirim pesan ke backend
     const sendMessage = async (e) => {
         e.preventDefault();
         try {
             const response = await fetch('http://localhost:5000/api/chat/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Sertakan cookies HttpOnly
                 body: JSON.stringify({ senderId: userId, receiverId, message }),
             });
 
             if (response.ok) {
                 setMessage('');
-                fetchMessages(); // Refresh the message list after sending
+                fetchMessages(); // Refresh daftar pesan setelah pengiriman
             } else {
                 alert('Failed to send message');
             }
@@ -62,7 +97,11 @@ const Chat = ({ userId }) => {
             <div>
                 {messages.map((msg) => (
                     <div key={msg.id}>
-                        {msg.senderId == userId ? (<strong>You: </strong>) : (<strong>From {msg.senderId}: </strong>)}
+                        {msg.senderId === userId ? (
+                            <strong>You to {msg.receiverId}: </strong>
+                        ) : (
+                            <strong>From {msg.senderId}: </strong>
+                        )}
                         <p>{msg.message}</p>
                     </div>
                 ))}
@@ -79,7 +118,7 @@ const Chat = ({ userId }) => {
                 </div>
                 <button type="submit">Send</button>
             </form>
-        </div >
+        </div>
     );
 };
 
