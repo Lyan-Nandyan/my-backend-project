@@ -1,6 +1,7 @@
 const CryptoJS = require("crypto-js");
 const Message = require("../models/Message");
 const { Op } = require("sequelize");
+const User = require("../models/User");
 require("dotenv").config();
 
 const encryptionKey = process.env.AES_SECRET_KEY;
@@ -82,9 +83,28 @@ const decryptMessage = (encryptedMessage) => {
 
 // Fungsi untuk mengirim pesan
 const sendMessage = async (req, res) => {
-  const { senderId, receiverId, message } = req.body;
+  const { senderId, username, message } = req.body;
 
   try {
+    const users = await User.findAll(); // Mengambil semua pengguna
+
+    // Loop untuk mencocokkan username yang didekripsi
+    const receiver = users.find((user) => {
+      try {
+        // Dekripsi username dari database
+        const decryptedUsername = decryptAES(user.username); // Fungsi dekripsi untuk username
+        return decryptedUsername === username; // Cocokkan dengan username yang diberikan
+      } catch (decryptError) {
+        console.error("Error decrypting username:", decryptError);
+        return false; // Jika terjadi kesalahan dalam dekripsi, lewati pengguna ini
+      }
+    });
+
+    if (!receiver) {
+      return res.status(404).json({ error: "Receiver not found" }); // Jika receiver tidak ditemukan, kirimkan respons 404
+    }
+    const receiverId = receiver.id; // Ambil receiverId berdasarkan username
+
     // Enkripsi pesan menggunakan super enkripsi
     const encryptedMessage = superEncryptMessage(message);
 
@@ -106,14 +126,37 @@ const sendMessage = async (req, res) => {
 
 // Fungsi untuk menerima pesan
 const getMessages = async (req, res) => {
-  const { userId } = req.params;
+  const { username } = req.params; // Ganti receiverId dengan username
+  const userId = req.userId; // ID pengguna yang login dari token
 
   try {
+    const users = await User.findAll(); // Mengambil semua pengguna
+
+    // Loop untuk mencocokkan username yang didekripsi
+    const receiver = users.find((user) => {
+      try {
+        // Dekripsi username dari database
+        const decryptedUsername = decryptAES(user.username); // Fungsi dekripsi untuk username
+        return decryptedUsername === username; // Cocokkan dengan username yang diberikan
+      } catch (decryptError) {
+        console.error("Error decrypting username:", decryptError);
+        return false; // Jika terjadi kesalahan dalam dekripsi, lewati pengguna ini
+      }
+    });
+
+    if (!receiver) {
+      return res.status(404).json({ error: "Receiver not found" }); // Jika receiver tidak ditemukan, kirimkan respons 404
+    }
+    const receiverId = receiver.id; // Ambil receiverId berdasarkan username
     // Ambil semua pesan yang dikirim atau diterima oleh user
     const messages = await Message.findAll({
       where: {
-        [Op.or]: [{ senderId: userId }, { receiverId: userId }],
+        [Op.or]: [
+          { senderId: userId, receiverId: receiverId },
+          { senderId: receiverId, receiverId: userId },
+        ],
       },
+      order: [["createdAt", "ASC"]], // Urutkan pesan berdasarkan waktu
     });
 
     // Cek apakah ada pesan

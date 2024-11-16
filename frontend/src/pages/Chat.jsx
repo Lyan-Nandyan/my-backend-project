@@ -5,6 +5,7 @@ const Chat = () => {
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState('');
     const [receiverId, setReceiverId] = useState('');
+    const [receiver, setReceiver] = useState('');
 
     useEffect(() => {
         // Ambil userId dari backend setelah login
@@ -32,24 +33,27 @@ const Chat = () => {
     }, []);
 
     useEffect(() => {
-        if (userId) {
+        if (receiverId) {
+            handleSetReceiver(),
             fetchMessages();
         }
-    }, [userId]);
+    }, [receiverId]);
 
     // Ambil pesan dari backend
     const fetchMessages = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/chat/${userId}/messages`, {
-                method: 'GET',
-                credentials: 'include', // Sertakan cookies HttpOnly
-            });
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setMessages(data);
-            } else {
-                console.error('Data received is not an array:', data);
-                setMessages([]); // Set sebagai array kosong jika tidak valid
+            if (receiverId) {
+                const response = await fetch(`http://localhost:5000/api/chat/messages/${receiverId}`, {
+                    method: 'GET',
+                    credentials: 'include', // Sertakan cookies HttpOnly
+                });
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    setMessages(data);
+                } else {
+                    console.error('Data received is not an array:', data);
+                    setMessages([]); // Set sebagai array kosong jika tidak valid
+                }
             }
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -64,12 +68,15 @@ const Chat = () => {
     // Mengirim pesan ke backend
     const sendMessage = async (e) => {
         e.preventDefault();
+
+        if (!message.trim()) return; // Jangan kirim jika pesan kosong
+
         try {
             const response = await fetch('http://localhost:5000/api/chat/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', // Sertakan cookies HttpOnly
-                body: JSON.stringify({ senderId: userId, receiverId, message }),
+                body: JSON.stringify({ senderId: userId, username:receiverId, message }),
             });
 
             if (response.ok) {
@@ -83,6 +90,11 @@ const Chat = () => {
         }
     };
 
+    // Fungsi untuk mengkonfirmasi receiver
+    const handleSetReceiver = () => {
+        setReceiverId(receiver); // Konfirmasi receiver yang diinput
+    };
+
     return (
         <div>
             <h2>Chat</h2>
@@ -90,32 +102,31 @@ const Chat = () => {
                 <input
                     type="text"
                     placeholder="Receiver User ID"
-                    value={receiverId}
-                    onChange={(e) => setReceiverId(e.target.value)}
+                    value={receiver}
+                    onChange={(e) => setReceiver(e.target.value)}
                 />
+                <button onClick={receiverId!=receiver ? handleSetReceiver : fetchMessages} >Set</button>
             </div>
             <div>
                 {messages.map((msg) => (
                     <div key={msg.id}>
                         {msg.senderId === userId ? (
-                            <strong>You to {msg.receiverId}: </strong>
+                            <p> <strong>You: </strong> {msg.message}</p>
                         ) : (
-                            <strong>From {msg.senderId}: </strong>
+                            <p> <strong>From {receiverId}: </strong> {msg.message}</p>
                         )}
-                        <p>{msg.message}</p>
                     </div>
                 ))}
             </div>
             <form onSubmit={sendMessage}>
-                <div>
-                    <input
-                        type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Type a message"
-                        required
-                    />
-                </div>
+
+                <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Type a message"
+                    required
+                />
                 <button type="submit">Send</button>
             </form>
         </div>

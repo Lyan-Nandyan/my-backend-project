@@ -5,6 +5,6 @@ const { verifyToken } = require("../middleware/verifyToken");
 // Route untuk mengirim pesan
 router.post("/send", verifyToken, sendMessage);
 // Route untuk mendapatkan pesan
-router.get("/:userId/messages", verifyToken, getMessages);
+router.get("/messages/:username", verifyToken, getMessages);
 
 module.exports = router;
