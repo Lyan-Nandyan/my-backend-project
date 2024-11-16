@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const sequelize = require('./config/database');
 const cors = require("cors"); // Import cors
 require("dotenv").config();
@@ -15,7 +16,8 @@ app.use(bodyParser.json());
 
 // Endpoint untuk registrasi
 app.use('/api/auth', authRoutes);
-
+// Endoint untuk Chat
+app.use('/api/chat', chatRoutes);
 // Sinkronisasi database
 PORT = process.env.PORT
 sequelize.sync().then(() => {

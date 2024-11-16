@@ -4,6 +4,7 @@ const { register, login } = require("../controllers/authController");
 
 // Route untuk registrasi
 router.post("/register", register);
+// Route untuk Login
 router.post('/login', login);
 
 module.exports = router;
