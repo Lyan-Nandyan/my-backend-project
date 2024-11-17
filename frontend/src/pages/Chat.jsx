@@ -21,7 +21,7 @@ const Chat = () => {
                 } else {
                     console.error('User not authenticated');
                     // Redirect ke halaman login jika belum login
-                    //window.location.href = '/';
+                    window.location.href = '/';
                 }
             } catch (error) {
                 console.error('Error fetching user ID:', error);
@@ -35,7 +35,7 @@ const Chat = () => {
     useEffect(() => {
         if (receiverId) {
             handleSetReceiver(),
-            fetchMessages();
+                fetchMessages();
         }
     }, [receiverId]);
 
@@ -76,7 +76,7 @@ const Chat = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', // Sertakan cookies HttpOnly
-                body: JSON.stringify({ senderId: userId, username:receiverId, message }),
+                body: JSON.stringify({ senderId: userId, username: receiverId, message }),
             });
 
             if (response.ok) {
@@ -97,38 +97,42 @@ const Chat = () => {
 
     return (
         <div>
-            <h2>Chat</h2>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Receiver Username"
-                    value={receiver}
-                    onChange={(e) => setReceiver(e.target.value)}
-                />
-                <button onClick={receiverId!=receiver ? handleSetReceiver : fetchMessages} >Set</button>
-            </div>
-            <div>
-                {messages.map((msg) => (
-                    <div key={msg.id}>
-                        {msg.senderId === userId ? (
-                            <p> <strong>You: </strong> {msg.message}</p>
-                        ) : (
-                            <p> <strong>From {receiverId}: </strong> {msg.message}</p>
-                        )}
+            {!userId ? "" : (
+                <div>
+                    <h2>Chat</h2>
+                    <div>
+                        <input
+                            type="text"
+                            placeholder="Receiver Username"
+                            value={receiver}
+                            onChange={(e) => setReceiver(e.target.value)}
+                        />
+                        <button onClick={receiverId != receiver ? handleSetReceiver : fetchMessages} >Set</button>
                     </div>
-                ))}
-            </div>
-            <form onSubmit={sendMessage}>
+                    <div>
+                        {messages.map((msg) => (
+                            <div key={msg.id}>
+                                {msg.senderId === userId ? (
+                                    <p> <strong>You: </strong> {msg.message}</p>
+                                ) : (
+                                    <p> <strong>From {receiverId}: </strong> {msg.message}</p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <form onSubmit={sendMessage}>
 
-                <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Type a message"
-                    required
-                />
-                <button type="submit">Send</button>
-            </form>
+                        <input
+                            type="text"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="Type a message"
+                            required
+                        />
+                        <button type="submit">Send</button>
+                    </form>
+                </div>
+            )}
         </div>
     );
 };
