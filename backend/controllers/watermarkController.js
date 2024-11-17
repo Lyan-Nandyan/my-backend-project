@@ -1,5 +1,5 @@
 const cloudinary = require("cloudinary").v2;
-const { addWatermark } = require("../utils/watermarkUtil"); // Sesuaikan dengan fungsi watermarking Anda
+const { addWatermark, extractWatermark } = require("../utils/watermarkUtil"); // Sesuaikan dengan fungsi watermarking Anda
 const multer = require("multer");
 const fs = require("fs");
 require("dotenv").config();
@@ -16,8 +16,8 @@ const upload = multer({
   dest: "uploads/",
   fileFilter: (req, file, cb) => {
     // Memastikan hanya gambar yang dapat diupload
-    if (!file.mimetype.startsWith('image/')) {
-      return cb(new Error('File harus berupa gambar'), false);
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("File harus berupa gambar"), false);
     }
     cb(null, true);
   },
@@ -49,7 +49,9 @@ const uploadAndAddWatermark = async (req, res) => {
 
       if (!result) {
         console.log("Cloudinary upload returned an empty response");
-        return res.status(500).json({ error: "Cloudinary upload returned an empty response" });
+        return res
+          .status(500)
+          .json({ error: "Cloudinary upload returned an empty response" });
       }
 
       const imageUrl = result.secure_url;
@@ -70,4 +72,32 @@ const uploadAndAddWatermark = async (req, res) => {
   });
 };
 
-module.exports = { uploadAndAddWatermark };
+// Endpoint untuk mengekstrak watermark dari gambar yang di-upload
+const extractWatermarkFromImage = async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error("Upload error:", err);
+      return res.status(400).json({ error: "Error uploading image" });
+    }
+
+    const imagePath = req.file.path;
+
+    try {
+      // Ekstrak watermark dari gambar
+      const watermarkText = await extractWatermark(imagePath);
+
+      // Hapus file gambar setelah proses ekstraksi
+      fs.unlinkSync(imagePath);
+
+      return res.status(200).json({
+        message: "Watermark extracted successfully",
+        watermarkText,
+      });
+    } catch (error) {
+      console.error("Error in watermark extraction process:", error);
+      res.status(500).json({ error: "Failed to extract watermark" });
+    }
+  });
+};
+
+module.exports = { uploadAndAddWatermark, extractWatermarkFromImage };

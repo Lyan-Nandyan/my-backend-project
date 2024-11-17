@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Register, Login, Chat, UploadImage } from './pages';//jangan lupa tambah kalau ada page baru
+import { Register, Login, Chat, UploadImage, ExtractWatermark } from './pages';//jangan lupa tambah kalau ada page baru
 
 // Definisikan routing
 const router = createBrowserRouter([
@@ -20,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: "/watermark",
     element: <UploadImage />,
+  },
+  {
+    path: "/extract_watermark",
+    element: <ExtractWatermark />,
   },
 ]);
 
