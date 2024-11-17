@@ -101,7 +101,7 @@ const Chat = () => {
             <div>
                 <input
                     type="text"
-                    placeholder="Receiver User ID"
+                    placeholder="Receiver Username"
                     value={receiver}
                     onChange={(e) => setReceiver(e.target.value)}
                 />
