@@ -6,6 +6,7 @@ const watermarkRoutes = require("./routes/watermarkRoutes");
 const verifRoutes = require("./routes/verifRoutes");
 const fileEncryptionController = require("./routes/fileEncryptRoutes");
 const loadImageController = require("./routes/loadImageRoutes");
+const Delete = require("./routes/DeleteRoutes");
 const sequelize = require("./config/database");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -29,6 +30,7 @@ app.use(express.json());
 // Parsing JSON body
 app.use(bodyParser.json());
 
+app.use(Delete);
 // Endpoint untuk registrasi dan login
 app.use("/api/", verifRoutes);
 

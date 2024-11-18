@@ -1,16 +1,16 @@
 const CryptoJS = require("crypto-js");
 require("dotenv").config();
 
-const encryptionKey = process.env.AES_SECRET_KEY;
+const encryptionKey = process.env.RC4_SECRET_KEY; // Ganti menjadi kunci untuk RC4
 
-// Fungsi untuk mengenkripsi username
-const encryptAES = (message) => {
-  return CryptoJS.AES.encrypt(message, encryptionKey).toString();
+// Fungsi untuk mengenkripsi dengan RC4
+const encryptRC4 = (message) => {
+  return CryptoJS.RC4.encrypt(message, encryptionKey).toString();
 };
 
-// Fungsi untuk mendekripsi username
-const decryptAES = (encryptedMessage) => {
-  const bytes = CryptoJS.AES.decrypt(encryptedMessage, encryptionKey);
+// Fungsi untuk mendekripsi dengan RC4
+const decryptRC4 = (encryptedMessage) => {
+  const bytes = CryptoJS.RC4.decrypt(encryptedMessage, encryptionKey);
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
@@ -51,20 +51,20 @@ const caesarCipher = (text, shift) => {
 
 // Fungsi untuk mengenkripsi pesan (Super Encryption)
 const superEncryptMessage = (message, caesarShift = 3) => {
-  const encryptedWithAES = encryptAES(message, encryptionKey); // Enkripsi dengan AES
-  const encryptedWithCaesar = caesarCipher(encryptedWithAES, caesarShift); // Enkripsi dengan Caesar
+  const encryptedWithRC4 = encryptRC4(message, encryptionKey); // Enkripsi dengan RC4
+  const encryptedWithCaesar = caesarCipher(encryptedWithRC4, caesarShift); // Enkripsi dengan Caesar
   return encryptedWithCaesar;
 };
 
 const superDecryptMessage = (message, caesarShift = 3) => {
   // Dekripsi dengan Caesar
   const decryptedWithCaesar = caesarCipher(message, -caesarShift);
-  // Dekripsi dengan AES
-  const originalText = decryptAES(decryptedWithCaesar, encryptionKey);
+  // Dekripsi dengan RC4
+  const originalText = decryptRC4(decryptedWithCaesar, encryptionKey);
   return originalText;
 };
 
-
+// Test Fungsi
 // const message = "Hello World!";
 // const encryptedMessageCaesar = caesarCipher(message, 3); // Enkripsi dengan Caesar
 // console.log("Encrypted with Caesar:", encryptedMessageCaesar);
@@ -72,19 +72,19 @@ const superDecryptMessage = (message, caesarShift = 3) => {
 // const decryptedMessageCaesar = caesarCipher(encryptedMessageCaesar, -3); // Dekripsi dengan Caesar
 // console.log("Decrypted with Caesar:", decryptedMessageCaesar);
 
-// // Enkripsi dengan AES
-// const encryptedMessage = encryptAES("Hello World!");
-// console.log("Encrypted with AES:", encryptedMessage);
+// Enkripsi dengan RC4
+// const encryptedMessage = encryptRC4("Hello World!");
+// console.log("Encrypted with RC4:", encryptedMessage);
 
-// // Dekripsi dengan AES
-// const decryptedMessage = decryptAES(encryptedMessage);
-// console.log("Decrypted with AES:", decryptedMessage);
+// Dekripsi dengan RC4
+// const decryptedMessage = decryptRC4(encryptedMessage);
+// console.log("Decrypted with RC4:", decryptedMessage);
 
-// // Enkripsi dengan AES
+// Enkripsi dengan Super (RC4 + Caesar)
 // const encryptedSuper = superEncryptMessage("Hello World!");
 // console.log("Encrypted with Super:", encryptedSuper);
 
-// // Dekripsi dengan AES
+// Dekripsi dengan Super
 // const decryptedSuper = superDecryptMessage(encryptedSuper);
 // console.log("Decrypted with Super:", decryptedSuper);
 
