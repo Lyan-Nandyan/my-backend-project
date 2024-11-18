@@ -1,20 +1,19 @@
 const fs = require("fs");
 const crypto = require("crypto");
-// const multer = require("multer");
 const axios = require("axios");
 const stream = require("stream");
 require("dotenv").config(); // Load environment variables from .env file
 
-// Kunci untuk AES-256 (32 byte) - Pastikan ini sama untuk enkripsi dan dekripsi
-const encryptionKey = Buffer.from(process.env.ENCRYPTION_KEY, "hex"); // Pastikan menggunakan kunci yang sama saat enkripsi/dekripsi
-const ivLength = 16; // AES-256-CBC membutuhkan IV 16-byte
+// Key for AES-256 (32 bytes) - This key should be securely stored and reused for both encryption and decryption
+const encryptionKey = Buffer.from(process.env.ENCRYPTION_KEY, "hex"); // Ensure this key is same during encryption and decryption
+const ivLength = 16; // AES-256-CBC requires a 16-byte IV
 
 // Encrypt File Function
 const encryptFile = (filePath) => {
   const iv = crypto.randomBytes(ivLength); // Create a new IV
   const cipher = crypto.createCipheriv("aes-256-cbc", encryptionKey, iv);
   const input = fs.createReadStream(filePath);
-  const encryptedFilePath = filePath;
+  const encryptedFilePath = filePath + ".enc";
   const output = fs.createWriteStream(encryptedFilePath);
 
   // Write IV + encrypted data to the file
@@ -79,4 +78,15 @@ const decryptFile = async (cloudinaryUrl) => {
   }
 };
 
-module.exports = { encryptFile, decryptFile };
+const deleteDecryptedFile = (filePath) => {
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`File ${filePath} berhasil dihapus.`);
+    }
+  } catch (error) {
+    console.error(`Gagal menghapus file ${filePath}:`, error);
+  }
+};
+
+module.exports = { encryptFile, decryptFile, deleteDecryptedFile };
