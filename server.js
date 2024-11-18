@@ -17,8 +17,8 @@ const app = express();
 // Aktifkan CORS dengan credentials
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true,
+    origin: "http://localhost:5173", // URL frontend di lokal Anda
+    credentials: true, // Jika Anda menggunakan cookie atau header khusus
   })
 );
 
