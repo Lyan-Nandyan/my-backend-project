@@ -14,6 +14,8 @@ cloudinary.config({
   secure: true,
 });
 
+console.log("test")
+
 // Setup multer to handle file uploads
 const upload = multer({
   dest: "uploads/", // Temporary storage for uploaded files
