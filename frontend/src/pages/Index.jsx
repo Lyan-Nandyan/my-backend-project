@@ -4,3 +4,4 @@ export { default as Register} from './Register';
 export { default as Chat} from './Chat';
 export { default as UploadImage} from './UploadImage';
 export { default as ExtractWatermark}from './ExtractWatermark';
+export { default as EncryptDecryptFile} from './EncryptDecryptFile';
