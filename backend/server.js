@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
-const chatRoutes = require("./routes/chatRoutes");
 const watermarkRoutes = require("./routes/watermarkRoutes");
 const verifRoutes = require("./routes/verifRoutes");
 const fileEncryptionController = require("./routes/fileEncryptRoutes");
@@ -31,22 +30,10 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 app.use(Delete);
-// Endpoint untuk registrasi dan login
 app.use("/api/", verifRoutes);
-
-// Endpoint untuk registrasi dan login
 app.use("/api/auth", authRoutes);
-
-// Endpoint untuk Chat
-app.use("/api/chat", chatRoutes);
-
-// Endoint untuk Watermark
 app.use("/api/watermark", watermarkRoutes);
-
-// Endoint untuk eknripsi file
 app.use("/api/file", fileEncryptionController);
-
-// Endoint untuk eknripsi file
 app.use("/api", loadImageController);
 
 // Sinkronisasi database
