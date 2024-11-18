@@ -2,7 +2,10 @@ const bcrypt = require("bcrypt");
 const CryptoJS = require("crypto-js");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const { superEncryptMessage, superDecryptMessage } = require("../utils/superEnkripsi");
+const {
+  superEncryptMessage,
+  superDecryptMessage,
+} = require("../utils/superEnkripsi");
 require("dotenv").config();
 
 const saltRounds = 10;
@@ -80,7 +83,7 @@ exports.login = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true, // Cookie tidak dapat diakses oleh JavaScript
       secure: process.env.NODE_ENV === "production", // Hanya dikirim melalui HTTPS jika di production
-      sameSite: "Strict", // Mengurangi risiko CSRF
+      sameSite: "None",
     });
 
     res.status(200).json({ message: "Login successful" });
