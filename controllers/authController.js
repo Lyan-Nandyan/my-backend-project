@@ -82,8 +82,8 @@ exports.login = async (req, res) => {
     // Kirim token sebagai cookie yang aman
     res.cookie("token", token, {
       httpOnly: true, // Cookie tidak dapat diakses oleh JavaScript
-      secure: process.env.NODE_ENV === "production", // Hanya dikirim melalui HTTPS jika di production
-      sameSite: "None",
+      // secure: process.env.NODE_ENV === "production", // Hanya dikirim melalui HTTPS jika di production
+      // sameSite: "None",
     });
 
     res.status(200).json({ message: "Login successful" });
