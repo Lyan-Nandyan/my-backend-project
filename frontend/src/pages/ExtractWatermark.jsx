@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { checkAuthentication } from '../utils/authUtils';
 
 const ExtractWatermark = () => {
     const [image, setImage] = useState(null);
     const [watermark, setWatermark] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const isAuthenticated = await checkAuthentication();
+            if (isAuthenticated) {
+                setIsAuthenticated(true);
+            } else {
+                setIsAuthenticated(false);
+                window.location.href = '/'; // Redirect ke halaman login jika tidak terautentikasi
+            }
+        };
+
+        checkAuth();
+    }, []);
+
+    if (isAuthenticated === null) return <div>Loading...</div>;
+    if (isAuthenticated === false) return null;
 
     // Fungsi untuk meng-handle perubahan gambar yang dipilih
     const handleImageChange = (e) => {

@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { checkAuthentication } from '../utils/authUtils';
 
 const UploadImage = () => {
     const [image, setImage] = useState(null);
     const [watermarkText, setWatermarkText] = useState('');
     const [uploadStatus, setUploadStatus] = useState(null);
     const [imageUrl, setImageUrl] = useState('');
+
+    const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const isAuthenticated = await checkAuthentication();
+            if (isAuthenticated) {
+                setIsAuthenticated(true);
+            } else {
+                setIsAuthenticated(false);
+                window.location.href = '/'; // Redirect ke halaman login jika tidak terautentikasi
+            }
+        };
+
+        checkAuth();
+    }, []);
+
+    if (isAuthenticated === null) return <div>Loading...</div>;
+    if (isAuthenticated === false) return null;
 
     // Fungsi untuk menangani perubahan pada file input
     const handleImageChange = (e) => {
@@ -20,8 +40,8 @@ const UploadImage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!image || !watermarkText) {
-            alert('Please select an image and enter watermark text');
+        if (!image) {
+            alert('Please select an image');
             return;
         }
 
@@ -84,7 +104,6 @@ const UploadImage = () => {
                         id="watermarkText"
                         value={watermarkText}
                         onChange={handleWatermarkChange}
-                        required
                     />
                 </div>
 

@@ -1,15 +1,10 @@
-const cloudinary = require("cloudinary").v2;
-const { addWatermark, extractWatermark } = require("../utils/watermarkUtil"); // Sesuaikan dengan fungsi watermarking Anda
+const { addWatermark, extractWatermark } = require("../utils/watermarkUtil");
+const { uploadToCloudinary } = require("../utils/CloudinaryUpUtil");
+const { superEncryptMessage, superDecryptMessage } = require("../utils/superEnkripsi");
+const { encryptFile, decryptFile } = require("../utils/fileEncryptionUtil");
+const { deleteFile } = require("../utils/fileUtil");
+const Image = require("../models/Image");
 const multer = require("multer");
-const fs = require("fs");
-require("dotenv").config();
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-});
 
 // Setup multer untuk menerima file upload, hanya gambar yang diterima
 const upload = multer({
@@ -23,6 +18,7 @@ const upload = multer({
   },
 }).single("image");
 
+// Fungsi utama untuk upload, menambahkan watermark, dan enkripsi file sebelum upload
 const uploadAndAddWatermark = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -30,49 +26,47 @@ const uploadAndAddWatermark = async (req, res) => {
       return res.status(400).json({ error: "Error uploading image" });
     }
 
-    const { watermarkText } = req.body; // Ambil teks watermark dari body
+    const { watermarkText } = req.body;
     const imagePath = req.file.path;
+    const senderId = req.userId;
 
     try {
       // Proses watermark pada gambar
       const watermarkedImagePath = await addWatermark(imagePath, watermarkText);
 
-      // Upload gambar yang sudah ada watermark-nya ke Cloudinary
-      const result = await cloudinary.uploader.upload(watermarkedImagePath);
+      // Enkripsi file sebelum di-upload ke Cloudinary
+      const encryptedFilePath = await encryptFile(watermarkedImagePath);
 
-      if (result && result.error) {
-        console.log("Cloudinary upload failed with error:", result.error);
-        return res.status(500).json({
-          error: `Cloudinary upload failed: ${result.error.message}`,
-        });
-      }
+      // Upload file yang sudah dienkripsi ke Cloudinary
+      const uploadedImageUrl = await uploadToCloudinary(encryptedFilePath);
 
-      if (!result) {
-        console.log("Cloudinary upload returned an empty response");
-        return res
-          .status(500)
-          .json({ error: "Cloudinary upload returned an empty response" });
-      }
-
-      const imageUrl = result.secure_url;
-      console.log("Image uploaded successfully to Cloudinary:", imageUrl);
+      // Enkripsi URL gambar yang di-upload
+      const encryptedImageUrl = superEncryptMessage(uploadedImageUrl);
 
       // Hapus file sementara setelah upload selesai
-      fs.unlinkSync(imagePath); // Menghapus file asli
-      fs.unlinkSync(watermarkedImagePath); // Menghapus file yang sudah diberi watermark
+      deleteFile(imagePath); // Menghapus file asli
+      deleteFile(watermarkedImagePath); // Menghapus file yang sudah diberi watermark
+      deleteFile(encryptedFilePath); // Menghapus file yang sudah dienkripsi
+
+      // Simpan informasi ke dalam database menggunakan model `Image`
+      await Image.create({
+        senderId: senderId,
+        link: encryptedImageUrl,
+        status: watermarkText === '' ? "noMark" : "Mark",
+      });
 
       return res.status(200).json({
-        message: "Image uploaded and watermarked",
-        imageUrl,
+        message: "Image uploaded, watermarked, encrypted, and saved to database",
+        imageUrl: superDecryptMessage(encryptedImageUrl),
       });
     } catch (error) {
-      console.error("Error in watermarking process:", error);
-      res.status(500).json({ error: "Failed to add watermark" });
+      console.error("Error in watermarking or encryption process:", error);
+      res.status(500).json({ error: "Failed to add watermark or encrypt image" });
     }
   });
 };
 
-// Endpoint untuk mengekstrak watermark dari gambar yang di-upload
+// Fungsi untuk mengekstrak watermark dari gambar yang di-upload
 const extractWatermarkFromImage = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -87,7 +81,7 @@ const extractWatermarkFromImage = async (req, res) => {
       const watermarkText = await extractWatermark(imagePath);
 
       // Hapus file gambar setelah proses ekstraksi
-      fs.unlinkSync(imagePath);
+      deleteFile(imagePath);
 
       return res.status(200).json({
         message: "Watermark extracted successfully",

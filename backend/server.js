@@ -2,9 +2,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const chatRoutes = require("./routes/chatRoutes");
-const verifRoutes = require("./routes/verifRoutes");
 const watermarkRoutes = require("./routes/watermarkRoutes");
+const verifRoutes = require("./routes/verifRoutes");
 const fileEncryptionController = require("./routes/fileEncryptRoutes");
+const loadImageController = require("./routes/loadImageRoutes");
 const sequelize = require("./config/database");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -29,19 +30,23 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 // Endpoint untuk registrasi dan login
+app.use("/api/", verifRoutes);
+
+// Endpoint untuk registrasi dan login
 app.use("/api/auth", authRoutes);
 
 // Endpoint untuk Chat
 app.use("/api/chat", chatRoutes);
-
-// Endpoint untuk verifikasi
-app.use("/api", verifRoutes);
 
 // Endoint untuk Watermark
 app.use("/api/watermark", watermarkRoutes);
 
 // Endoint untuk eknripsi file
 app.use("/api/file", fileEncryptionController);
+
+// Endoint untuk eknripsi file
+app.use("/api", loadImageController);
+
 // Sinkronisasi database
 const PORT = process.env.PORT; // Gunakan default 5000 jika PORT tidak diset
 sequelize.sync().then(() => {

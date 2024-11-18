@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const {verifyToken} = require("../middleware/verifyToken");
+const { verifyToken } = require("../middleware/verifyToken");
 
 // Route untuk mendapatkan informasi pengguna setelah token diverifikasi
-router.get("/userinfo", verifyToken, (req, res) => {
-  // Mengirimkan ID pengguna dari token yang sudah diverifikasi
-  res.status(200).json({ userId: req.userId });
+router.post("/check-auth", verifyToken, (req, res) => {
+  // Jika sampai di sini, berarti token valid dan pengguna terotentikasi
+  res.status(200).json({ isAuthenticated: true });
 });
 
 module.exports = router;

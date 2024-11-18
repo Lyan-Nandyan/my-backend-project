@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Register, Login, Chat, UploadImage, ExtractWatermark, EncryptDecryptFile } from './pages';//jangan lupa tambah kalau ada page baru
+import { Register, Login, UploadImage, ExtractWatermark, Dashboard } from './pages';//jangan lupa tambah kalau ada page baru
 
 // Definisikan routing
 const router = createBrowserRouter([
@@ -14,10 +14,6 @@ const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/chat",
-    element: <Chat />,
-  },
-  {
     path: "/watermark",
     element: <UploadImage />,
   },
@@ -26,8 +22,8 @@ const router = createBrowserRouter([
     element: <ExtractWatermark />,
   },
   {
-    path: "/file",
-    element: <EncryptDecryptFile />,
+    path: "/dashboard",
+    element: <Dashboard />,
   },
 ]);
 

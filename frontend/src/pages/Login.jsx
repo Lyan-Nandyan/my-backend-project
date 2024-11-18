@@ -21,7 +21,7 @@ const Login = () => {
       }
 
       alert('Login successful!');
-      window.location.href = "/chat";
+      window.location.href = "/watermark";
       // Redirect user or perform additional actions here
     } catch (error) {
       console.error('Error during login:', error);
