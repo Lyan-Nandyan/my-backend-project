@@ -17,7 +17,7 @@ const app = express();
 // Aktifkan CORS dengan credentials
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Pastikan ini sesuai dengan alamat frontend Anda
+    origin: 'https://my-frontend-project-m8pv.vercel.app', // Pastikan ini sesuai dengan alamat frontend Anda
     credentials: true, // Jika Anda menggunakan cookies atau header khusus
   })
 );
