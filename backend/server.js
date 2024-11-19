@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const watermarkRoutes = require("./routes/watermarkRoutes");
 const verifRoutes = require("./routes/verifRoutes");
-const fileEncryptionController = require("./routes/fileEncryptRoutes");
 const loadImageController = require("./routes/loadImageRoutes");
 const Delete = require("./routes/DeleteRoutes");
 const sequelize = require("./config/database");
@@ -17,8 +16,8 @@ const app = express();
 // Aktifkan CORS dengan credentials
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true,
+    origin: 'http://localhost:5173', // Pastikan ini sesuai dengan alamat frontend Anda
+    credentials: true, // Jika Anda menggunakan cookies atau header khusus
   })
 );
 
@@ -33,7 +32,6 @@ app.use(Delete);
 app.use("/api/", verifRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/watermark", watermarkRoutes);
-app.use("/api/file", fileEncryptionController);
 app.use("/api", loadImageController);
 
 // Sinkronisasi database

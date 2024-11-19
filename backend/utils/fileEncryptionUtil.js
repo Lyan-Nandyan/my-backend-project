@@ -5,8 +5,9 @@ const stream = require("stream");
 require("dotenv").config(); // Load environment variables from .env file
 
 // Key for AES-256 (32 bytes) - This key should be securely stored and reused for both encryption and decryption
-const encryptionKey = Buffer.from(process.env.ENCRYPTION_KEY, "hex"); // Ensure this key is same during encryption and decryption
+const encryptionKey = Buffer.from('1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', 'hex'); // Ensure this key is same during encryption and decryption
 const ivLength = 16; // AES-256-CBC requires a 16-byte IV
+console.log("berhasil membuat kunci");
 
 // Encrypt File Function
 const encryptFile = (filePath) => {
@@ -15,6 +16,7 @@ const encryptFile = (filePath) => {
   const input = fs.createReadStream(filePath);
   const encryptedFilePath = filePath + ".enc";
   const output = fs.createWriteStream(encryptedFilePath);
+  console.log("berhasil mgubah file");
 
   // Write IV + encrypted data to the file
   const ivBuffer = Buffer.from(iv);

@@ -16,7 +16,7 @@ const UploadImage = () => {
                 setIsAuthenticated(true);
             } else {
                 setIsAuthenticated(false);
-                window.location.href = '/'; // Redirect ke halaman login jika tidak terautentikasi
+               // window.location.href = '/'; // Redirect ke halaman login jika tidak terautentikasi
             }
         };
 
@@ -52,7 +52,7 @@ const UploadImage = () => {
         try {
             setUploadStatus('Uploading...');
 
-            const response = await fetch('http://localhost:5000/api/watermark/upload', {
+            const response = await fetch('https://my-backend-project-production-c8a7.up.railway.app/api/watermark/upload', {
                 method: 'POST',
                 body: formData,  // Tidak perlu kirim token, karena token sudah ada di cookie
                 credentials: 'include',  // Pastikan cookie dikirim dengan request

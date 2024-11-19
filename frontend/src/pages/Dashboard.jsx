@@ -30,7 +30,7 @@ const ImageGallery = () => {
                 if (storedImages) {
                     setImages(storedImages);
                 } else {
-                    const response = await fetch("http://localhost:5000/api/images", { credentials: 'include' });
+                    const response = await fetch("https://my-backend-project-production-c8a7.up.railway.app/api/images", { credentials: 'include' });
                     const data = await response.json();
 
                     if (response.ok) {
@@ -61,7 +61,7 @@ const ImageGallery = () => {
     // Fungsi untuk menghapus gambar
     const deleteImage = async (imageId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/delete/${imageId}`, {
+            const response = await fetch(`https://my-backend-project-production-c8a7.up.railway.app/api/delete/${imageId}`, {
                 method: 'POST',
                 credentials: 'include',
             });
