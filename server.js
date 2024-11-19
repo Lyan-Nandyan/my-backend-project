@@ -4,6 +4,7 @@ const authRoutes = require("./routes/authRoutes");
 const watermarkRoutes = require("./routes/watermarkRoutes");
 const verifRoutes = require("./routes/verifRoutes");
 const loadImageController = require("./routes/loadImageRoutes");
+const logout = require("./routes/logoutRoutes");
 const Delete = require("./routes/DeleteRoutes");
 const sequelize = require("./config/database");
 const cors = require("cors");
@@ -33,7 +34,7 @@ app.use("/api/", verifRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/watermark", watermarkRoutes);
 app.use("/api", loadImageController);
-
+app.use("/api", logout);
 // Sinkronisasi database
 const PORT = process.env.PORT; // Gunakan default 5000 jika PORT tidak diset
 sequelize.sync().then(() => {
