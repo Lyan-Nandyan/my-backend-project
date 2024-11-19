@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const watermarkRoutes = require("./routes/watermarkRoutes");
 const verifRoutes = require("./routes/verifRoutes");
-const fileEncryptionController = require("./routes/fileEncryptRoutes");
 const loadImageController = require("./routes/loadImageRoutes");
 const Delete = require("./routes/DeleteRoutes");
 const sequelize = require("./config/database");
@@ -33,7 +32,6 @@ app.use(Delete);
 app.use("/api/", verifRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/watermark", watermarkRoutes);
-app.use("/api/file", fileEncryptionController);
 app.use("/api", loadImageController);
 
 // Sinkronisasi database
